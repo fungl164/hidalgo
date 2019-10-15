@@ -60,6 +60,14 @@ func (db *DB) Close() error {
 func (db *DB) Tx(rw bool) (flat.Tx, error) {
 	return &Tx{t: db.t, rw: rw}, nil
 }
+func (db *DB) View(fn func(tx flat.Tx) error) error {
+	tx, _ := db.Tx(false)
+	return fn(tx)
+}
+func (db *DB) Update(fn func(tx flat.Tx) error) error {
+	tx, _ := db.Tx(true)
+	return fn(tx)
+}
 
 type Tx struct {
 	t  *Tree

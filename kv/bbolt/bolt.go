@@ -85,6 +85,16 @@ func (db *DB) Tx(rw bool) (kv.Tx, error) {
 	return &Tx{tx: tx}, nil
 }
 
+func (db *DB) View(fn func(tx kv.Tx) error) error {
+	tx, _ := db.Tx(false)
+	return fn(tx)
+}
+
+func (db *DB) Update(fn func(tx kv.Tx) error) error {
+	tx, _ := db.Tx(true)
+	return fn(tx)
+}
+
 type Tx struct {
 	tx *bolt.Tx
 }
