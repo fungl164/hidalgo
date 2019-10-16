@@ -33,7 +33,7 @@ type hieKV struct {
 	flat KV
 }
 
-func keyEscape(k kv.Key) Key {
+func KeyEscape(k kv.Key) Key {
 	var k2 Key
 	for i, s := range k {
 		if i != 0 {
@@ -88,8 +88,14 @@ func (kv *hieKV) View(fn func(tx kv.Tx) error) error {
 	if err != nil {
 		return err
 	}
-	return fn(tx)
+	err = fn(tx)
+	if err == nil {
+		return tx.Close()
+	}
+	defer tx.Close()
+	return err
 }
+
 func (kv *hieKV) Update(fn func(tx kv.Tx) error) error {
 	tx, err := kv.Tx(true)
 	if err != nil {
@@ -108,7 +114,7 @@ func (tx *flatTx) key(key kv.Key) Key {
 	if len(key) == 0 {
 		return nil
 	}
-	return keyEscape(key)
+	return KeyEscape(key)
 }
 
 func (tx *flatTx) Get(ctx context.Context, key kv.Key) (kv.Value, error) {
@@ -142,8 +148,8 @@ func (tx *flatTx) Del(k kv.Key) error {
 	return tx.tx.Del(tx.key(k))
 }
 
-func (tx *flatTx) Scan(pref kv.Key) kv.Iterator {
-	return &prefIter{kv: tx.kv, Iterator: tx.tx.Scan(tx.key(pref))}
+func (tx *flatTx) Scan(opt *kv.ScanOptions) kv.Iterator {
+	return &prefIter{kv: tx.kv, Iterator: tx.tx.Scan(opt)}
 }
 
 type prefIter struct {

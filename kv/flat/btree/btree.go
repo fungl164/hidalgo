@@ -111,8 +111,8 @@ func (tx *Tx) Del(k flat.Key) error {
 	tx.t.Delete(k)
 	return nil
 }
-func (tx *Tx) Scan(pref flat.Key) flat.Iterator {
-	return &Iterator{t: tx.t, pref: pref}
+func (tx *Tx) Scan(opt *flat.ScanOptions) flat.Iterator {
+	return &Iterator{t: tx.t, pref: flat.KeyEscape(opt.Prefix)}
 }
 
 type Iterator struct {

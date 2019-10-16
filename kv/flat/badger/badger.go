@@ -117,19 +117,27 @@ func (tx *Tx) Del(k flat.Key) error {
 	return tx.tx.Delete(k)
 }
 
-func (tx *Tx) Scan(pref flat.Key) flat.Iterator {
-	it := tx.tx.NewIterator(badger.DefaultIteratorOptions)
-	return &Iterator{it: it, pref: pref, first: true}
+func (tx *Tx) Scan(opt *flat.ScanOptions) flat.Iterator {
+	opts := badger.DefaultIteratorOptions
+	opts.PrefetchValues = !opt.KeysOnly
+	it := tx.tx.NewIterator(opts)
+	return &Iterator{it: it, pref: flat.KeyEscape(opt.Prefix), limit: opt.Limit, first: true}
 }
 
 type Iterator struct {
 	it    *badger.Iterator
 	pref  flat.Key
 	first bool
+	count int
+	limit int
 	err   error
 }
 
 func (it *Iterator) Next(ctx context.Context) bool {
+	it.count = it.count + 1
+	if it.limit > 0 && it.count >= it.limit {
+		return false
+	}
 	if it.first {
 		it.first = false
 		it.it.Seek(it.pref)

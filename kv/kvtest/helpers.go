@@ -73,7 +73,7 @@ func (t Test) Scan(pref kv.Key, exp []kv.Pair) {
 	require.NoError(t.t, err)
 	defer tx.Close()
 
-	it := tx.Scan(pref)
+	it := tx.Scan(&kv.ScanOptions{Prefix: pref})
 	defer it.Close()
 	require.NoError(t.t, it.Err())
 

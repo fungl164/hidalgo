@@ -179,9 +179,9 @@ func (tx *Tx) Del(k kv.Key) error {
 	return b.Delete(k[0])
 }
 
-func (tx *Tx) Scan(pref kv.Key) kv.Iterator {
-	kpref := pref
-	b, p := tx.bucket(pref)
+func (tx *Tx) Scan(opt *kv.ScanOptions) kv.Iterator {
+	kpref := opt.Prefix
+	b, p := tx.bucket(opt.Prefix)
 	if b == nil || len(p) > 1 {
 		// if the prefix key is still longer than 1, it means that
 		// a bucket mentioned in the prefix does not exists and

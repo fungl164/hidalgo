@@ -12,6 +12,6 @@ func TestSepEscape(t *testing.T) {
 		[]byte(`\/aa/b\b/c/d/\`),
 		[]byte(`/aa/b\b/c/d/`),
 	}
-	k2 := keyUnescape(keyEscape(k))
+	k2 := keyUnescape(KeyEscape(k))
 	require.Equal(t, k, k2)
 }

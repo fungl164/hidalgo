@@ -122,6 +122,20 @@ type Getter interface {
 	Get(ctx context.Context, key Key) (Value, error)
 }
 
+type ScanOptions struct {
+	// KeysOnly is a hint for backend to pre-fetch keys as an optimization for an iterator.
+	KeysOnly bool
+	// Limit limits the maximal number of key/value pairs to return. Limit <= 0 indicates an unlimited number of results.
+	Limit int
+	// Prefix is used as a filter for the key scan
+	Prefix Key
+}
+
+type Scanner interface {
+	// Scan iterates over all tuples matching specific parameters.
+	Scan(opt *ScanOptions) Iterator
+}
+
 // Tx is a transaction over hierarchical key-value store.
 type Tx interface {
 	base.Tx
@@ -136,7 +150,8 @@ type Tx interface {
 	// Del removes the key from the database. See Put for consistency guaranties.
 	Del(k Key) error
 	// Scan will iterate over all key-value pairs with a specific key prefix.
-	Scan(pref Key) Iterator
+	// Scan(pref Key) Iterator
+	Scanner
 }
 
 // Iterator is an iterator over hierarchical key-value store.

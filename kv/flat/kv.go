@@ -56,6 +56,9 @@ type Getter interface {
 	Get(ctx context.Context, key Key) (Value, error)
 }
 
+// ScanOptions is a convenience structure derived from kv package
+type ScanOptions = kv.ScanOptions
+
 // Tx is a transaction over flat key-value store.
 type Tx interface {
 	base.Tx
@@ -69,8 +72,8 @@ type Tx interface {
 	Put(k Key, v Value) error
 	// Del removes the key from the database. See Put for consistency guaranties.
 	Del(k Key) error
-	// Scan will iterate over all key-value pairs with a specific key prefix.
-	Scan(pref Key) Iterator
+	// Scan will iterate over all key-value pairs with a specific scan options.
+	Scan(opt *ScanOptions) Iterator
 }
 
 // Iterator is an iterator over flat key-value store.

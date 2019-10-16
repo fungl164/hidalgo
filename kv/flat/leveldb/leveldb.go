@@ -159,8 +159,8 @@ func (tx *Tx) Del(k flat.Key) error {
 	}
 	return tx.tx.Delete(k, tx.db.wo)
 }
-func (tx *Tx) Scan(pref flat.Key) flat.Iterator {
-	r, ro := util.BytesPrefix(pref), tx.db.ro
+func (tx *Tx) Scan(opt *flat.ScanOptions) flat.Iterator {
+	r, ro := util.BytesPrefix(flat.KeyEscape(opt.Prefix)), tx.db.ro
 	var it iterator.Iterator
 	if tx.tx != nil {
 		it = tx.tx.NewIterator(r, ro)
